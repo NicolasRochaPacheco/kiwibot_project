@@ -185,7 +185,7 @@ void WheelOdometry::CalculateOdometry()
     float FL_vel = (2.0 * PI * m_wheel_rad * m_motors_rpm.rpms_fl) / 60.0;
     /********************************************
      * END CODE
-     *  ********************************************/
+     ********************************************/
 
     /* Left and Right linear velocities */
     float R_vel = (FR_vel + RR_vel) / 2.0f;
@@ -303,14 +303,18 @@ void WheelOdometry::CalculateOdometry()
 
         /********************************************
          * Your Amazing tachometer
-        float d_increment = ?;
+         * ******************************************/
+        float d_increment = std::sqrt(
+            pow(X - m_previous_x, 2) +
+            pow(Y - m_previous_y, 2)
+        );
 
         // Update previous data
-        m_previous_x = ?;
-        m_previous_y = ?;
+        m_previous_x = X;
+        m_previous_y = Y;
 
         // Accumulate distance
-        m_total_distance.data = ?;
+        m_total_distance.data = m_total_distance.data + d_increment;
         /********************************************
          * END CODE
          *  ********************************************/
