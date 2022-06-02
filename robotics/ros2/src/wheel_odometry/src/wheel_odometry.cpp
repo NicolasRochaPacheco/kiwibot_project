@@ -269,18 +269,19 @@ void WheelOdometry::CalculateOdometry()
 
     /********************************************
      * Calculate the X and Y positions
-    float delta_X_global = ?;
-    float delta_Y_global = ?;
+     * ******************************************/
+    float delta_X_global = X_dot_global * dt;
+    float delta_Y_global = Y_dot_global * dt;
 
     // Don't forget the offset :smile:
-    float X_global = ?;
-    float Y_global = ?;
+    float X_global = m_global_wheel_odom_msg.pose.pose.position.x + delta_X_global;
+    float Y_global = m_global_wheel_odom_msg.pose.pose.position.y + delta_Y_global;
 
-    m_global_wheel_odom_msg.pose.pose.position.x = ?;
-    m_global_wheel_odom_msg.pose.pose.position.y = ?;
+    m_global_wheel_odom_msg.pose.pose.position.x = X_global;
+    m_global_wheel_odom_msg.pose.pose.position.y = Y_global;
     /********************************************
      * END CODE
-     *  ********************************************/
+     * ********************************************/
 
     m_global_wheel_odom_msg.pose.pose.position.z = 0.0f;
     m_global_wheel_odom_msg.pose.covariance = m_local_wheel_odom_msg.pose.covariance;
