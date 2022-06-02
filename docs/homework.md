@@ -249,6 +249,13 @@ Respond below in the same solution branch every question. In case your answer is
 
 1. [C++] What is the mean of the number "15" used in the `pthread_kill` inside the destructor method?
 
+  Answer: pthread_kill terminates the process given by pthread_id and emits a signal with code 15. The 15 value is
+  equivalent to SIGTERM, which terminates a process under Linux systems.
+
+  References:
+      - https://pubs.opengroup.org/onlinepubs/009696899/functions/pthread_kill.html
+      - https://komodor.com/learn/sigterm-signal-15-exit-code-143-linux-graceful-termination/
+
 2. [C++] Why are we using `UniquePointer` instead of `SharedPointers` to publish a ROS2 message?
 
 3. [Logic] Why are we using an m_multi_sound variable? Explain ...
