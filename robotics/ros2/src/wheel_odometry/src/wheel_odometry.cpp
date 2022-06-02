@@ -215,16 +215,16 @@ void WheelOdometry::CalculateOdometry()
 
     /* Wheels linear velocities */
     /********************************************
-     * Calculate the X and Y positions
-    float delta_X = ?;
-    float delta_Y = ?;
+     * Calculate the X and Y positions */
+    float delta_X = X_dot * dt;
+    float delta_Y = Y_dot * dt;
 
     // Don't forget the offset :smile:
-    float X = ?;
-    float Y = ?;
+    float X = m_local_wheel_odom_msg.pose.pose.position.x + delta_X;
+    float Y = m_local_wheel_odom_msg.pose.pose.position.y + delta_Y;
 
-    m_local_wheel_odom_msg.pose.pose.position.x = ?;
-    m_local_wheel_odom_msg.pose.pose.position.y = ?;
+    m_local_wheel_odom_msg.pose.pose.position.x = X;
+    m_local_wheel_odom_msg.pose.pose.position.y = Y;
     /********************************************
      * END CODE
      *  ********************************************/
