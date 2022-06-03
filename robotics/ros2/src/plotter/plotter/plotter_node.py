@@ -66,9 +66,27 @@ class Plotter(Node):
         # NOT define new variables use the variables defined along the code
         #
         # Self-contained reference :smile:
+        (self.control_ang_ln,) = self.ax[1].plot(
+            [], [], "r", label="Angular Linear Signal"
+        )
+        (self.error_angular_ln,) = self.ax[1].plot([], [], "b", label="Angular Error")
+        self.controller_ang_lns = [self.control_ang_ln, self.error_angular_ln]
+        self.ax[1].legend()
+        self.x_ang_data, self.y_ang_data = [[], []], [[], []]
         #
         # End Code
         # ---------------------------------------------------------------------
+
+        (self.fr_rpm_ln,) = self.ax[2].plot([], [], "r", label="FR RMPs")
+        (self.rr_rpm_ln,) = self.ax[2].plot([], [], "b", label="RR RMPs")
+        (self.rl_rpm_ln,) = self.ax[2].plot([], [], "g", label="RL RMPs")
+        (self.fl_rpm_ln,) = self.ax[2].plot([], [], "m", label="FL RMPs")
+        self.rpm_lns = [self.fr_rpm_ln, self.rr_rpm_ln, self.rl_rpm_ln, self.fl_rpm_ln]
+        self.ax[2].legend()
+        self.fr_rpms_data = [[], []]
+        self.rr_rpms_data = [[], []]
+        self.rl_rpms_data = [[], []]
+        self.fl_rpms_data = [[], []]
 
         # =============================================================================
         # ROS2 Stuffs
@@ -142,7 +160,13 @@ class Plotter(Node):
 
         self.controller_ang_lns[0].set_data(self.x_ang_data[0], self.y_ang_data[0])
         self.controller_ang_lns[1].set_data(self.x_ang_data[1], self.y_ang_data[1])
-        return [self.controller_lin_lns, self.controller_ang_lns]
+
+        self.rpm_lns[0].set_data(self.fr_rpms_data[0], self.fr_rpms_data[1])
+        self.rpm_lns[1].set_data(self.rr_rpms_data[0], self.rr_rpms_data[1])
+        self.rpm_lns[2].set_data(self.rl_rpms_data[0], self.rl_rpms_data[1])
+        self.rpm_lns[3].set_data(self.fl_rpms_data[0], self.fl_rpms_data[1])
+
+        return [self.controller_lin_lns, self.controller_ang_lns, self.rpm_lns]
 
     # Callback functions
     def cb_cmd_vel(self, msg: Twist) -> None:
@@ -177,7 +201,21 @@ class Plotter(Node):
         Callback function to get motors RPMS feedback
         @param msg 'MotorsRPM' message containing the velocities of the robot
         """
-        return
+        self.fr_rpms_data[1].append(msg.rpms_fr)
+        fr_rpms_indx = len(self.fr_rpms_data[1])
+        self.fr_rpms_data[0].append(fr_rpms_indx)
+
+        self.rr_rpms_data[1].append(msg.rpms_rr)
+        rr_rpms_indx = len(self.rr_rpms_data[1])
+        self.rr_rpms_data[0].append(rr_rpms_indx)
+
+        self.rl_rpms_data[1].append(msg.rpms_rl)
+        rl_rpms_indx = len(self.rl_rpms_data[1])
+        self.rl_rpms_data[0].append(rl_rpms_indx)
+
+        self.fl_rpms_data[1].append(msg.rpms_fl)
+        fl_rpms_indx = len(self.rl_rpms_data[1])
+        self.fl_rpms_data[0].append(fl_rpms_indx)
 
 
 # =============================================================================
@@ -197,7 +235,14 @@ def main(args=None) -> None:
     # TODO: Create a Thread for spin the node
     # Use the function spin_node
     # https://realpython.com/intro-to-python-threading/
-    #
+
+    # Create the thread using the threading library
+    spin_th = threading.Thread(target=plotter_node.spin_node)
+
+    # Start the thread
+    spin_th.start()
+
+    # ---------------------------------------------------------------------
     # End Code
     # ---------------------------------------------------------------------
 
