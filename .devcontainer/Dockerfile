@@ -161,4 +161,7 @@ ENV ulimit -c 0
 # -----------------------------------------------------------------------------
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=
-CMD ["/bin/bash"]
+
+RUN /bin/echo "source /opt/ros/galactic/setup.bash" >> /home/koda/.bashrc
+
+CMD ["/bin/bash", "-c"]
