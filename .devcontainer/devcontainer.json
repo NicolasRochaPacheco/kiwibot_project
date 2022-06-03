@@ -4,10 +4,7 @@
 	"service": "kodencio",
 	"workspaceFolder": "/workspace",
 	"settings": {
-		"terminal.integrated.automationProfile.linux": {
-			"path": "/bin/bash",
-			"icon": "symbol-null"
-		},
+		"terminal.integrated.defaultProfile.linux": "bash",
 		"editor.formatOnSave": true,
 		"python.formatting.provider": "black",
 		"python.formatting.blackPath": "/usr/local/bin/black",
