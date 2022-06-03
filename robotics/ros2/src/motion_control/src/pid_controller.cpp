@@ -57,7 +57,32 @@ float PIDController::SteeringPID(float ref_wz, float cur_wz, double dt)
      * "Combined FeedForward and Feedback Control"
      ********************************************/
 
-
+    // Check if the controller is used or not
+    if (m_steering_ctrl) {
+        // Check if the velocity is zero
+        if (ref_wz == 0.0) {
+            // Reset the integral error
+            m_wz_int_error = 0.0;
+            // Return zero
+            return 0.0;
+        }
+        // Define the error variable
+        float wz_err = ref_wz - cur_wz;
+        // Update the integral error
+        m_wz_int_error += wz_err;
+        // Calculate the differential error
+        float wz_diff_err = (wz_err - m_wz_prop_ek1) / dt;
+        // Update the previous error
+        m_wz_prop_ek1 = wz_err;
+        // Calculate the PID control signal
+        float wz_pid_sig = m_kp_str * wz_err + m_kd_str * wz_diff_err + m_ki_str * m_wz_int_error;
+        // Calculate the FF control signal
+        float wz_ff_sig = m_kff_str * ref_wz; // TODO: Not sure of this part.
+        // Return the sum of PID and FF control signals
+        return wz_pid_sig + wz_ff_sig;
+    }
+    // If controller is not used, return reference value
+    else{return ref_wz;}
 
     /********************************************
      * END CODE
