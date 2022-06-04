@@ -42,20 +42,32 @@ class Plotter(Node):
         # =============================================================================
         # Define Plotter Variables
         # =============================================================================
-        self.fig, self.ax = plt.subplots(1, 3)
-        self.fig.suptitle("Amazing Plotter", fontsize=16)
+        self.fig, self.ax = plt.subplots(3, 1)
+        self.fig.suptitle(
+            "Amazing Plotter", fontsize=20, color="#E66000", fontweight=700
+        )
         self.fig.set_size_inches(18.5, 10.5)
+        self.fig.set_facecolor("#000000")
+
+        for axes in self.ax:
+            axes.set_facecolor("#131C26")
+            axes.tick_params(color="w", labelcolor="w")
+            for spine in axes.spines.values():
+                spine.set_edgecolor("w")
         # =============================================================================
         # Controller Lines
         # =============================================================================
 
         # Linear
         (self.control_lin_ln,) = self.ax[0].plot(
-            [], [], "r", label="Control Linear Signal"
+            [], [], "#FF0000", label="Control Linear Signal"
         )
-        (self.error_linear_ln,) = self.ax[0].plot([], [], "b", label="Linear Error")
+        (self.error_linear_ln,) = self.ax[0].plot(
+            [], [], "#002BFF", label="Linear Error", linestyle="dashed"
+        )
         self.controller_lin_lns = [self.control_lin_ln, self.error_linear_ln]
         self.ax[0].legend()
+        self.ax[0].grid(linestyle="dashed", linewidth=0.5)
         self.x_linear_data, self.y_linear_data = [[], []], [[], []]
 
         # Angular
@@ -67,22 +79,26 @@ class Plotter(Node):
         #
         # Self-contained reference :smile:
         (self.control_ang_ln,) = self.ax[1].plot(
-            [], [], "r", label="Angular Linear Signal"
+            [], [], "#FF0000", label="Angular Linear Signal"
         )
-        (self.error_angular_ln,) = self.ax[1].plot([], [], "b", label="Angular Error")
+        (self.error_angular_ln,) = self.ax[1].plot(
+            [], [], "#002BFF", label="Angular Error", linestyle="dashed"
+        )
         self.controller_ang_lns = [self.control_ang_ln, self.error_angular_ln]
         self.ax[1].legend()
+        self.ax[1].grid(linestyle="dashed", linewidth=0.5)
         self.x_ang_data, self.y_ang_data = [[], []], [[], []]
         #
         # End Code
         # ---------------------------------------------------------------------
 
-        (self.fr_rpm_ln,) = self.ax[2].plot([], [], "r", label="FR RMPs")
-        (self.rr_rpm_ln,) = self.ax[2].plot([], [], "b", label="RR RMPs")
-        (self.rl_rpm_ln,) = self.ax[2].plot([], [], "g", label="RL RMPs")
-        (self.fl_rpm_ln,) = self.ax[2].plot([], [], "m", label="FL RMPs")
+        (self.fr_rpm_ln,) = self.ax[2].plot([], [], "#FF0000", label="FR RMPs")
+        (self.rr_rpm_ln,) = self.ax[2].plot([], [], "#002BFF", label="RR RMPs")
+        (self.rl_rpm_ln,) = self.ax[2].plot([], [], "#55FF00", label="RL RMPs")
+        (self.fl_rpm_ln,) = self.ax[2].plot([], [], "#FF00EA", label="FL RMPs")
         self.rpm_lns = [self.fr_rpm_ln, self.rr_rpm_ln, self.rl_rpm_ln, self.fl_rpm_ln]
         self.ax[2].legend()
+        self.ax[2].grid(linestyle="dashed", linewidth=0.5)
         self.fr_rpms_data = [[], []]
         self.rr_rpms_data = [[], []]
         self.rl_rpms_data = [[], []]
@@ -135,15 +151,15 @@ class Plotter(Node):
         """
         self.ax[0].set_xlim(0, 10000)
         self.ax[0].set_ylim(-3, 3)
-        self.ax[0].set_title("Linear Signal / Linear Error")
+        self.ax[0].set_title("Linear Signal / Linear Error", c="w")
 
         self.ax[1].set_xlim(0, 10000)
         self.ax[1].set_ylim(-3, 3)
-        self.ax[1].set_title("Angular Signal / Angular Error")
+        self.ax[1].set_title("Angular Signal / Angular Error", c="w")
 
         self.ax[2].set_xlim(0, 10000)
         self.ax[2].set_ylim(-170, 170)
-        self.ax[2].set_title("RPMs")
+        self.ax[2].set_title("RPMs", c="w")
 
         return [self.controller_lin_lns, self.controller_ang_lns]
 
