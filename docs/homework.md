@@ -262,7 +262,7 @@ Respond below in the same solution branch every question. In case your answer is
 
 4. [C++] Why are we freeing the memory allocated by raw pointer "buff" variable and not freeing the memory allocated by the Shared and Unique Pointers? (HARD)
 
-* *Answer*:  
+* *Answer*: `buff` references a memory block that is explicitly allocated to store the audio signal from the wav files in memory. Used pointers are considered to be "smart". Smart pointers ensure that memory gets automatically freed after references are destroyed. However, when using `malloc()` that memory de-allocation might not happen, so it is explicitly indicated in the `Speaker` class destructor. Failing to free the memory allocation is a bad programming practice and could produce memory leaks.
 
 5. [C++] Why should we use a "member variable" (persistent over the class) to storage the integral error? `m_vx_int_error`
 
@@ -321,6 +321,8 @@ For extra homework you should create a new branch from the developed one when yo
   * Updated the `Dockerfile` to add the `source <path_to_ros>/setup.bash` command to the `.bashrc` file of the container. Adjusted the `devcontainer.json` to latest setting to open `bash` console on VS Code terminal instead of `sh`.
 
 2. **[+10%/5.0]:** Make that Kiwibot track2.wav don't get distorted. Use: `ros2 topic pub -1 /device/speaker/command std_msgs/Int8 "data: 2"`
+  * The `track2.wav` file has a higher bitrate than the other audio files. This was found by checking the audio files parameters. Eery file has a bitrate of 1411 kbps but the `track2.wav`, which has a bitrate of 2116. This sets audio files of being 32-bit while `track2.wav` being 48-bit. 
+
 3. **[+20%/5.0]:** Transform the `rpm_converter` `Node` to a [CascadeLifecycleNode](https://github.com/fmrico/cascade_lifecycle)
 4. **[+5%/5.0]:** Create a Dockerfile to build OpenCV from scratch based on the `ubuntu:20.04` public image
 5. **[+10%/5.0]:** Integrate an Anti-Windup based on the max. linear speed 
