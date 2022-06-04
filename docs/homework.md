@@ -274,7 +274,7 @@ Respond below in the same solution branch every question. In case your answer is
 
 7. [ROS2] What is the purpose of `CascadeLifecycleNode` type nodes?
 
-* *Answer*:  
+* *Answer*:  ROS2 introduces the idea of [Lifecycle Node](https://design.ros2.org/articles/node_lifecycle.html) which creates "states" within the nodes. However, this raw approach requires a node to manage the states of the other nodes. A CascadeLifecycleNode allows to create dependencies between nodes. These dependencies force transitioning states in every node (hence its name "cascade") if a node transitions to a given state.
 
 8. [Robotics] Why is a global and a local `Odometry` calculated?
 
