@@ -20,6 +20,7 @@ from rclpy.node import Node
 from rclpy.callback_groups import ReentrantCallbackGroup
 
 # ROS2 messages
+from std_msgs.msg import Int8
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import TwistStamped
 
@@ -146,12 +147,43 @@ class Plotter(Node):
             callback_group=self.callback_group,
         )
 
+        # Publisher for playing a sound
+        self.pub_track = self.create_publisher(
+            msg_type=Int8, topic="/device/speaker/command", qos_profile=5
+        )
+
+        # Timer for checking the RPMs and playing a sound
+        self.timer = self.create_timer(0.25, self.cb_rpm_timer)
+        # Variable for storing the latest RPM value
+        self.last_rpm = 0
+
     # Hack Function to not block the thread
     def spin_node(self) -> None:
         """!
         Function to spin the node
         """
         rclpy.spin(self)
+
+    # Timer callback for playing sounds
+    def cb_rpm_timer(self) -> None:
+        """!
+        Function check the RPM velocities
+        """
+        # Create the message file
+        msg = Int8()
+        # Check if last RPM value is greater than 150
+        if self.last_rpm > 150:
+            # Fill the message with value
+            msg.data = 3
+            # Publish the message
+            self.pub_track.publish(msg)
+
+        # Check if last RPM value is lower than -150
+        elif self.last_rpm < -150:
+            # Fill the message with value
+            msg.data = 4
+            # Publish the message
+            self.pub_track.publish(msg)
 
     # Plotter Functions
     def plot_init(self) -> None:
@@ -243,6 +275,8 @@ class Plotter(Node):
         """
         # Convert time message field to float
         rpm_timestamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+        # Store the last RPM value
+        self.last_rpm = msg.rpms_fr
         # Append time to corresponding axis
         self.rpms_time.append(rpm_timestamp)
         # Append data into FR RPMs data variable
