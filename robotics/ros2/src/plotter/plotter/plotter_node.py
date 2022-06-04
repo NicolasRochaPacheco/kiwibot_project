@@ -11,6 +11,7 @@ Code Information:
 # =============================================================================
 
 # Basics
+import time
 import threading
 
 # ROS2 dependencies
@@ -68,7 +69,7 @@ class Plotter(Node):
         self.controller_lin_lns = [self.control_lin_ln, self.error_linear_ln]
         self.ax[0].legend()
         self.ax[0].grid(linestyle="dashed", linewidth=0.5)
-        self.x_linear_data, self.y_linear_data = [[], []], [[], []]
+        self.lin_cmd_data, self.lin_err_data = [], []
 
         # Angular
 
@@ -87,7 +88,8 @@ class Plotter(Node):
         self.controller_ang_lns = [self.control_ang_ln, self.error_angular_ln]
         self.ax[1].legend()
         self.ax[1].grid(linestyle="dashed", linewidth=0.5)
-        self.x_ang_data, self.y_ang_data = [[], []], [[], []]
+        self.ang_cmd_data, self.ang_err_data = [], []
+
         #
         # End Code
         # ---------------------------------------------------------------------
@@ -99,10 +101,17 @@ class Plotter(Node):
         self.rpm_lns = [self.fr_rpm_ln, self.rr_rpm_ln, self.rl_rpm_ln, self.fl_rpm_ln]
         self.ax[2].legend()
         self.ax[2].grid(linestyle="dashed", linewidth=0.5)
-        self.fr_rpms_data = [[], []]
-        self.rr_rpms_data = [[], []]
-        self.rl_rpms_data = [[], []]
-        self.fl_rpms_data = [[], []]
+        self.fr_rpms_data = []
+        self.rr_rpms_data = []
+        self.rl_rpms_data = []
+        self.fl_rpms_data = []
+
+        # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        # Define the time arrays for plots
+        # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        self.lin_cmd_time, self.lin_err_time = [], []
+        self.ang_cmd_time, self.ang_err_time = [], []
+        self.rpms_time = []
 
         # =============================================================================
         # ROS2 Stuffs
@@ -149,15 +158,12 @@ class Plotter(Node):
         """!
         Function to set the initial plot status.
         """
-        self.ax[0].set_xlim(0, 10000)
         self.ax[0].set_ylim(-3, 3)
         self.ax[0].set_title("Linear Signal / Linear Error", c="w")
 
-        self.ax[1].set_xlim(0, 10000)
         self.ax[1].set_ylim(-3, 3)
         self.ax[1].set_title("Angular Signal / Angular Error", c="w")
 
-        self.ax[2].set_xlim(0, 10000)
         self.ax[2].set_ylim(-170, 170)
         self.ax[2].set_title("RPMs", c="w")
 
@@ -167,20 +173,37 @@ class Plotter(Node):
         """!
         Function to update the current figure
         """
-        self.controller_lin_lns[0].set_data(
-            self.x_linear_data[0], self.y_linear_data[0]
-        )
-        self.controller_lin_lns[1].set_data(
-            self.x_linear_data[1], self.y_linear_data[1]
-        )
+        self.controller_lin_lns[0].set_data(self.lin_cmd_time, self.lin_cmd_data)
+        self.controller_lin_lns[1].set_data(self.lin_err_time, self.lin_err_data)
 
-        self.controller_ang_lns[0].set_data(self.x_ang_data[0], self.y_ang_data[0])
-        self.controller_ang_lns[1].set_data(self.x_ang_data[1], self.y_ang_data[1])
+        self.controller_ang_lns[0].set_data(self.ang_cmd_time, self.ang_cmd_data)
+        self.controller_ang_lns[1].set_data(self.ang_err_time, self.ang_err_data)
 
-        self.rpm_lns[0].set_data(self.fr_rpms_data[0], self.fr_rpms_data[1])
-        self.rpm_lns[1].set_data(self.rr_rpms_data[0], self.rr_rpms_data[1])
-        self.rpm_lns[2].set_data(self.rl_rpms_data[0], self.rl_rpms_data[1])
-        self.rpm_lns[3].set_data(self.fl_rpms_data[0], self.fl_rpms_data[1])
+        self.rpm_lns[0].set_data(self.rpms_time, self.fr_rpms_data)
+        self.rpm_lns[1].set_data(self.rpms_time, self.rr_rpms_data)
+        self.rpm_lns[2].set_data(self.rpms_time, self.rl_rpms_data)
+        self.rpm_lns[3].set_data(self.rpms_time, self.fl_rpms_data)
+
+        # Check that linear ERR time list length is not zero
+        if len(self.lin_err_time) > 0:
+            # Get the most recent time stamp from list
+            last_lin_err_time = self.lin_err_time[-1]
+            # Define the plot axes window based on most recent time
+            self.ax[0].set_xlim(last_lin_err_time - 10, last_lin_err_time)
+
+        # Check that angular ERR time list length is not zero
+        if len(self.ang_err_time) > 0:
+            # Get the most recent time stamp from list
+            last_ang_err_time = self.ang_err_time[-1]
+            # Define the plot axes window based on most recent time
+            self.ax[1].set_xlim(last_ang_err_time - 10, last_ang_err_time)
+
+        # Check that RPMs time list length is not zero
+        if len(self.rpms_time) > 0:
+            # Get the most recent time stamp from list
+            last_rpm_time = self.rpms_time[-1]
+            # Define the plot axes window based on most recent time
+            self.ax[2].set_xlim(last_rpm_time - 10, last_rpm_time)
 
         return [self.controller_lin_lns, self.controller_ang_lns, self.rpm_lns]
 
@@ -190,48 +213,46 @@ class Plotter(Node):
         Callback function to get the velocity control signal.
         @param msg 'Twist' message containing the velocities of the robot
         """
-        self.y_linear_data[0].append(msg.linear.x)
-        x_index = len(self.x_linear_data[0])
-        self.x_linear_data[0].append(x_index + 1)
-
-        self.y_ang_data[0].append(msg.angular.z)
-        x_index2 = len(self.x_ang_data[0])
-        self.x_ang_data[0].append(x_index2 + 1)
+        # Convert time stamp into variable
+        cmd_timestamp = time.time()
+        # Append time into cmd time lists
+        self.lin_cmd_time.append(cmd_timestamp)
+        self.ang_cmd_time.append(cmd_timestamp)
+        # Append cmd values to data lists
+        self.lin_cmd_data.append(msg.linear.x)
+        self.ang_cmd_data.append(msg.angular.z)
 
     def cb_error_vel(self, msg: TwistStamped) -> None:
         """!
         Callback function to get the error between the reference and the current velocity
         @param msg 'TwistStamped' message containing the velocities of the robot
         """
-
-        self.y_linear_data[1].append(msg.twist.linear.x)
-        x_index = len(self.x_linear_data[1])
-        self.x_linear_data[1].append(x_index + 1)
-
-        self.y_ang_data[1].append(msg.twist.angular.z)
-        x_index2 = len(self.x_ang_data[1])
-        self.x_ang_data[1].append(x_index2 + 1)
+        # Convert time stamp into variable
+        err_timestamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+        # Append time into err time lists
+        self.lin_err_time.append(err_timestamp)
+        self.ang_err_time.append(err_timestamp)
+        # Append err values to data lists
+        self.lin_err_data.append(msg.twist.linear.x)
+        self.ang_err_data.append(msg.twist.angular.z)
 
     def cb_rpm_feedback(self, msg: MotorsRPM) -> None:
         """!
         Callback function to get motors RPMS feedback
         @param msg 'MotorsRPM' message containing the velocities of the robot
         """
-        self.fr_rpms_data[1].append(msg.rpms_fr)
-        fr_rpms_indx = len(self.fr_rpms_data[1])
-        self.fr_rpms_data[0].append(fr_rpms_indx)
-
-        self.rr_rpms_data[1].append(msg.rpms_rr)
-        rr_rpms_indx = len(self.rr_rpms_data[1])
-        self.rr_rpms_data[0].append(rr_rpms_indx)
-
-        self.rl_rpms_data[1].append(msg.rpms_rl)
-        rl_rpms_indx = len(self.rl_rpms_data[1])
-        self.rl_rpms_data[0].append(rl_rpms_indx)
-
-        self.fl_rpms_data[1].append(msg.rpms_fl)
-        fl_rpms_indx = len(self.rl_rpms_data[1])
-        self.fl_rpms_data[0].append(fl_rpms_indx)
+        # Convert time message field to float
+        rpm_timestamp = msg.header.stamp.sec + msg.header.stamp.nanosec * 1e-9
+        # Append time to corresponding axis
+        self.rpms_time.append(rpm_timestamp)
+        # Append data into FR RPMs data variable
+        self.fr_rpms_data.append(msg.rpms_fr)
+        # Append data into RR RPMs data variable
+        self.rr_rpms_data.append(msg.rpms_rr)
+        # Append data into RL RPMs data variable
+        self.rl_rpms_data.append(msg.rpms_rl)
+        # Append data into FL RPMs data variable
+        self.fl_rpms_data.append(msg.rpms_fl)
 
 
 # =============================================================================
