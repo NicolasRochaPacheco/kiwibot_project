@@ -324,6 +324,8 @@ For extra homework you should create a new branch from the developed one when yo
 3. **[+20%/5.0]:** Transform the `rpm_converter` `Node` to a [CascadeLifecycleNode](https://github.com/fmrico/cascade_lifecycle)
 4. **[+5%/5.0]:** Create a Dockerfile to build OpenCV from scratch based on the `ubuntu:20.04` public image
 5. **[+10%/5.0]:** Integrate an Anti-Windup based on the max. linear speed 
+  * Added the anti-windup in the [pid_controller.cpp](../robotics/ros2/src/motion_control/src/pid_controller.cpp) implementation file. The new controller checks if calculated control signal is higher than maximum linear speed. If higher, the maximum linear speed is returned. PID calculated signal is returned otherwise.
+
 6. **[+10%/5.0]:** Play a sound if the RPM feedback increase X value and another when the RPM decrease X value. Define by yourself the X value
   * RPMs callback store the latest value of FR wheel. A timer is defined with a period of 0.25 seconds. The timer callback function checks two conditions based on the latest FR wheel RPM value: if the value is higher than 150 or if it is lower than 150. If the value is higher than 150, track three (3) is played. Track four (4) is played if the RPM value is lower than -150. The timer is used for two reasons: to prevent publishing values based on the RPMs message callback, which would generate track play commands at a high frequency. The second one is to control the frequency in which the checks are performed and the track messages published.
 
