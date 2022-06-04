@@ -318,6 +318,8 @@ Next questions are after you finish the project, it doesn't give points, but we 
 For extra homework you should create a new branch from the developed one when you finish the basic points of the homework, you can name this new branch as *feature/extra_homework*, don't forget to push it before the time that it was given.
 
 1. **[+5%/5.0]**: Modify the docker file to source ROS2 and have autocompleted commands like ```ros2 topic list```.
+  * Updated the `Dockerfile` to add the `source <path_to_ros>/setup.bash` command to the `.bashrc` file of the container. Adjusted the `devcontainer.json` to latest setting to open `bash` console on VS Code terminal instead of `sh`.
+
 2. **[+10%/5.0]:** Make that Kiwibot track2.wav don't get distorted. Use: `ros2 topic pub -1 /device/speaker/command std_msgs/Int8 "data: 2"`
 3. **[+20%/5.0]:** Transform the `rpm_converter` `Node` to a [CascadeLifecycleNode](https://github.com/fmrico/cascade_lifecycle)
 4. **[+5%/5.0]:** Create a Dockerfile to build OpenCV from scratch based on the `ubuntu:20.04` public image
@@ -327,7 +329,10 @@ For extra homework you should create a new branch from the developed one when yo
 8. **[+5%/5.0]**: Add the `DELETE_BUILD` argument to the `startRobotics.sh` file (check line 61). Options : `--delete-build / -d`. Example: `startRobotics.sh -d 1` will delete the previous generated install, build, and log folders. Use 0 as default value.
 9. **[+5%/5.0]**: use `Valgrind` to analyses the `speed_controller` executable. [How to use it](./valgrind_usage.md). Why use `Valgrind`?
 10. **[+15%/5.0]**: The plotter node graph just until 10000 in the X axis, look for a way to dynamically change this value whilst the data is coming. Also, the lower limit (0) should change and keep a distance of 500 for the upper limit.
+  * Changed from data indexes to timestamps (thinking of the scope of the point to be dynamic axes instead of indexes) and adjusted axes to be dynamically plotted. Error and RPM data had timestamps in their messages (`TwistStamped`) while CMD data lacked timestamps. Used system time instead. Thought of changing CMD message type to stamped version but it conflicted from basic points. Another option would be creating a custom message that included the header and two twist message instances. RPMs timestamps are different since they come from the rosbag. This situation creates a mismatch between the LIN and ANG graphs against the RPMs graph. If clock comes from the same source, graphs might be aligned (hopefully).
+
 11. **[Max. +10%/5.0]**: Beauty the plotter. The best will get 10%, second one 5%. Reference Image:
+  * Changed the layout from "horizontal" to "vertical" to improve graphs' visibility. Change color palette to neon palette inspired on KiwiBot webpage. Used dark background to allow for multiple colors in graph. Added dashed lines to error lines to improve visibility of command lines. 
 
   <p align="center">
   <img height="400" src="https://user-images.githubusercontent.com/39452483/170590011-0220a4be-60fb-4754-bfb1-0b76c1e4b33a.png">
