@@ -248,41 +248,65 @@ Reference Image
 Respond below in the same solution branch every question. In case your answer isn't in this file, it'll not be valid:
 
 1. [C++] What is the mean of the number "15" used in the `pthread_kill` inside the destructor method?
-
-  Answer: pthread_kill terminates the process given by pthread_id and emits a signal with code 15. The 15 value is
+  
+  * *Answer*: pthread_kill terminates the process given by pthread_id and emits a signal with code 15. The 15 value is
   equivalent to SIGTERM, which terminates a process under Linux systems.
-
-  References:
-      - https://pubs.opengroup.org/onlinepubs/009696899/functions/pthread_kill.html
-      - https://komodor.com/learn/sigterm-signal-15-exit-code-143-linux-graceful-termination/
 
 2. [C++] Why are we using `UniquePointer` instead of `SharedPointers` to publish a ROS2 message?
 
+  * *Answer*: `UniquePointer` only allow a single pointer to target a resource, while `SharedPointers` allow multiple pointers to a given resource. Hence, when using a ROS2 message, we want a single pointer to aim at the message. If multiple pointers were aiming at the same message, different instances might change the data in the message. 
+
 3. [Logic] Why are we using an m_multi_sound variable? Explain ...
+
+  * *Answer*: it is a variable that is used to indicate the node to either play the ambient sound or a specific track. The variable disables (sets to zero) when a different sound is played and enables (sets to one) to play the ambient sound.
 
 4. [C++] Why are we freeing the memory allocated by raw pointer "buff" variable and not freeing the memory allocated by the Shared and Unique Pointers? (HARD)
 
+* *Answer*:  
+
 5. [C++] Why should we use a "member variable" (persistent over the class) to storage the integral error? `m_vx_int_error`
+
+* *Answer*: because the error depends on previous values. If it was not a member variable, the cumulative integral error could not persist during multiple PID controller calculations.
 
 6. [Control] What is the function of the FeedForward controller?
 
+* *Answer*:  
+
 7. [ROS2] What is the purpose of `CascadeLifecycleNode` type nodes?
+
+* *Answer*:  
 
 8. [Robotics] Why is a global and a local `Odometry` calculated?
 
+* *Answer*:  the local odometry calculates the robot position based in the wheels RPMs. However, measurement of the RPMs does not take into account effects such as the robot wheels slipping. The global odometry calculates the robot position by taking into account the data from the IMU. By using the IMU data, it is possible to calculate the slip factor of the robot and provide a better estimation of the robot position in the space.
+
 9. [Robotics] If the robot has 4 differential wheels, what type of chassis is it?
+
+* *Answer*: It is a four-wheeled differential robot. This type of chassis allow the robot to independently move each of the four wheels in the robot.
 
 10. [Docker] Explain with your own words what is the instructions `apt-get autoremove && apt-get clean -y for?`
 
+* *Answer*:  `autoremove` eliminates packages that are not longer required by the system. If a package requires a dependency, and the package is then uninstalled, the dependency is no longer required and is identified and eliminated with `autoremove` (the command was banned in ROS Kinetic because it used to eliminate the whole stack). `clean` frees space in the disk by removing the downloaded versions of the packages (packages cache). The `-y` flag is to indicate that the user agrees to do whatever changes are made by `clean`.
+
 11. [Docker] If you modify a layer what happen with the previous and the next ones?
+
+* *Answer*:  The previous layers are not affected by the change since they do not depend on the layer that has been modified. However, subsequent layers are required to be built again since they depend on the modified layer. Nonetheless, if you clear Docker cache, you will require to build every layer again.
 
 12. [Docker] Can we change the basic image (`FROM ubuntu:20.04`) from the docker file to another?
 
+* *Answer*:  Yes, it can be changed to `FROM ubuntu:latest` to always use the latest version of Ubuntu. It could also be changed to `FROM ubuntu:22.04` to force this specific version of Ubuntu, which is also the latest LTS version. Finally, it could be changed to `FROM ubuntu:devel` to use the latest development image of the OS.
+
 13. [C++] What is the [libsoft_speed.a](../robotics/ros2/src/motion_control/lib/) file and what is it for?
+
+* *Answer*: it is a dynamic library that allows to generate speed profiles according to mathematical interpolation methods (spline). It is used to adjust the reference speed values in order to achieve a smooth transition of the reference speed for the robot. The library is defined in the `soft_speed_spline.hpp` file, and linked to the package in the `CMakeLists.txt` file.
 
 14. [Python] Why should we use a thread to spin the node?
 
+* *Answer*: because the node would be "frozen" if we did not do so. Under the ROS context, "frozen" means that the node would not be aware of incoming topics, services, actions thus impeding it from having its intended functionality. The thread ensures that the code would not block in the line in which the spin is called. By using the thread, the spin is executed in the "background".
+
 15. [Python] Why is the limit on the Y-RPM graph 170?
+
+* *Answer*: because its the maximum value that the RPMs can have in the robot. By playing the rosbag and watching the graph, it is possible to confirm that this is the maximum achievable value for the RPMs.
 
 Next questions are after you finish the project, it doesn't give points, but we really appreciate you feedback:
 * What do you think about this project? Is it hard or enough? Is it to complicated, is it well structure, explanations and instructions are clear?
