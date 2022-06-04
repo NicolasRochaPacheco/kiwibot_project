@@ -34,8 +34,17 @@ float PIDController::ThrottlePID(float ref_vx, float cur_vx, double dt)
         float diff_err = (vx_err - m_vx_prop_ek1) / dt;
         // Update the previous error value
         m_vx_prop_ek1 = vx_err;
-        // Return the control value
-        return m_kp_thr * vx_err + m_ki_thr * m_vx_int_error + m_kd_thr * diff_err;
+        // Calculate the control signal value
+        float throttle_pid_sig = m_kp_thr * vx_err + m_ki_thr * m_vx_int_error + m_kd_thr * diff_err;
+        // Check if the control signal value is higher than maximum linear speed
+        if (throttle_pid_sig > m_max_linear_spd){
+            // Return maximum linear speed in control signal
+            return m_max_linear_spd;
+        } else {
+            // Return the control value
+            return throttle_pid_sig;
+        }
+
     }
     // Return reference value if controller is not used
     else {return ref_vx;}
