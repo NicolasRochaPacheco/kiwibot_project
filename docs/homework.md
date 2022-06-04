@@ -270,11 +270,11 @@ Respond below in the same solution branch every question. In case your answer is
 
 6. [Control] What is the function of the FeedForward controller?
 
-* *Answer*:  
+* *Answer*: a FeedForward controller provides a complementary relationship between reactive and predictive controllers. The reactive controller (FeedBack), such as a PID, generates control signals based on the errors from the system, while the predictive (FeedForward) generates them expecting the system to behave in a particular manner.
 
 7. [ROS2] What is the purpose of `CascadeLifecycleNode` type nodes?
 
-* *Answer*:  ROS2 introduces the idea of [Lifecycle Node](https://design.ros2.org/articles/node_lifecycle.html) which creates "states" within the nodes. However, this raw approach requires a node to manage the states of the other nodes. A CascadeLifecycleNode allows to create dependencies between nodes. These dependencies force transitioning states in every node (hence its name "cascade") if a node transitions to a given state.
+* *Answer*:  ROS2 introduces the idea of [Lifecycle Node](https://design.ros2.org/articles/node_lifecycle.html) which creates "states" within the nodes. However, this raw approach requires a node to manage the states of the other nodes. A CascadeLifecycleNode allows to create dependencies between nodes. These dependencies force transitioning states in every node (hence its name "cascade") if a node transitions to a given state. This approach makes easier to handle state transitions among different nodes.
 
 8. [Robotics] Why is a global and a local `Odometry` calculated?
 
