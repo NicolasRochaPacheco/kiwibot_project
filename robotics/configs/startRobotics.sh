@@ -26,16 +26,22 @@ function parse_yaml {
 
 BUILD=1
 LAUNCH=1
+# Iterate over parameters
 for i in "$@"
 do
+    # Checks the argument against the case
     case $i in
         -b|--build) BUILD="${2:-1}"
         ;;
         -l|--launch) LAUNCH="${2:-1}"
         ;;
+        -d|--delete-build) DELETE_BUILD="${2:-1}"
+        ;;
         *)
         ;;
     esac
+
+    # Moves areguments to left (don't check values)
     shift
 done
 
