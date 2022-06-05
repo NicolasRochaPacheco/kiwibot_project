@@ -324,7 +324,10 @@ For extra homework you should create a new branch from the developed one when yo
   * The `track2.wav` file has a higher bitrate than the other audio files. This was found by checking the audio files parameters. Eery file has a bitrate of 1411 kbps but the `track2.wav`, which has a bitrate of 2116. This sets audio files of being 32-bit while `track2.wav` being 48-bit. 
 
 3. **[+20%/5.0]:** Transform the `rpm_converter` `Node` to a [CascadeLifecycleNode](https://github.com/fmrico/cascade_lifecycle)
+
 4. **[+5%/5.0]:** Create a Dockerfile to build OpenCV from scratch based on the `ubuntu:20.04` public image
+  * [Dockerfile](../.devcontainer/opencv/Dockerfile) created to download OpenCV 4.5.5 and build it from source. It was not added to development container.
+
 5. **[+10%/5.0]:** Integrate an Anti-Windup based on the max. linear speed 
   * Added the anti-windup in the [pid_controller.cpp](../robotics/ros2/src/motion_control/src/pid_controller.cpp) implementation file. The new controller checks if calculated control signal is higher than maximum linear speed. If higher, the maximum linear speed is returned. PID calculated signal is returned otherwise.
 
