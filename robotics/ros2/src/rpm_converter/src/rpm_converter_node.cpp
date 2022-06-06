@@ -7,8 +7,9 @@
 
 #include "rpm_converter/rpm_converter.hpp"
 
+
 RpmConverter::RpmConverter(rclcpp::NodeOptions const &options)
-    : Node("rpm_converter", options)
+    : CascadeLifecycleNode("rpm_converter", options)
 {
   RCLCPP_INFO(this->get_logger(), "RpmConverter constructor");
 
@@ -182,10 +183,13 @@ int main(int argc, char *argv[])
   rclcpp::NodeOptions options;
   rclcpp::executors::SingleThreadedExecutor executor;
 
+  // Create the node intance
   auto rpm_converter_node = std::make_shared<RpmConverter>(options);
 
-  executor.add_node(rpm_converter_node);
+  // Add the node to executor
+  executor.add_node(rpm_converter_node->get_node_base_interface());
 
+  // 
   auto period = std::chrono::milliseconds(rpm_converter_node->m_publish_time);
   rclcpp::Rate r(period);
   while (rclcpp::ok())
