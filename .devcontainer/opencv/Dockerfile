@@ -22,13 +22,12 @@ RUN apt-get update \
 WORKDIR /opt/
 
 # Download packages and extract them
-RUN wget -O opencv.zip  --no-check-certificate https://github.com/opencv/opencv/archive/4.5.5.zip
-RUN unzip opencv.zip
+RUN wget -O opencv.zip  --no-check-certificate https://github.com/opencv/opencv/archive/4.5.5.zip \
+    && unzip opencv.zip \
+    && cd /opt/opencv/
 
 # Move into OpenCV build directory
 WORKDIR /opt/opencv/
-
-RUN ls /bin/
 
 # Configure 
 RUN cmake ../opencv-4.5.5
