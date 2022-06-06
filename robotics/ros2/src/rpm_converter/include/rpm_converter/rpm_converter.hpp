@@ -19,6 +19,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/transform_datatypes.h>
 #include <rclcpp/rclcpp.hpp>
+#include "rclcpp_cascade_lifecycle/rclcpp_cascade_lifecycle.hpp"
 
 // ROS2 Messages
 #include "geometry_msgs/msg/twist_stamped.hpp"
@@ -37,7 +38,8 @@
 
 using std::placeholders::_1;
 
-class RpmConverter : public rclcpp::Node
+// Changed class inheritance to CascadeLifecycleNode
+class RpmConverter : public rclcpp_cascade_lifecycle::CascadeLifecycleNode
 {
 
 public:
