@@ -7,6 +7,9 @@
   <maintainer email="davidson@kiwibot.com">koda</maintainer>
   <license>TODO: License declaration</license>
 
+  <depend>utils</depend>
+  <depend>usr_msgs</depend>
+
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <export>
