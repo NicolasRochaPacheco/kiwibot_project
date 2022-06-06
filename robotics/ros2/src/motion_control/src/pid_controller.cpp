@@ -29,7 +29,7 @@ float PIDController::ThrottlePID(float ref_vx, float cur_vx, double dt)
         // Define the error variable
         float vx_err = ref_vx - cur_vx;
         // Update integral error
-        m_vx_int_error += vx_err;
+        m_vx_int_error += vx_err * dt;
         // Calculate the differential error
         float diff_err = (vx_err - m_vx_prop_ek1) / dt;
         // Update the previous error value
@@ -78,7 +78,7 @@ float PIDController::SteeringPID(float ref_wz, float cur_wz, double dt)
         // Define the error variable
         float wz_err = ref_wz - cur_wz;
         // Update the integral error
-        m_wz_int_error += wz_err;
+        m_wz_int_error += wz_err * dt;
         // Calculate the differential error
         float wz_diff_err = (wz_err - m_wz_prop_ek1) / dt;
         // Update the previous error
@@ -86,7 +86,7 @@ float PIDController::SteeringPID(float ref_wz, float cur_wz, double dt)
         // Calculate the PID control signal
         float wz_pid_sig = m_kp_str * wz_err + m_kd_str * wz_diff_err + m_ki_str * m_wz_int_error;
         // Calculate the FF control signal
-        float wz_ff_sig = m_kff_str * ref_wz; // TODO: Not sure of this part.
+        float wz_ff_sig = m_kff_str * ref_wz; // Sure of this part.
         // Return the sum of PID and FF control signals
         return wz_pid_sig + wz_ff_sig;
     }
