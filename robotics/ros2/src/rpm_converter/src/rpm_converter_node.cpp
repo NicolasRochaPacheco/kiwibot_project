@@ -7,10 +7,10 @@
 
 #include "rpm_converter/rpm_converter.hpp"
 
-
-RpmConverter::RpmConverter(rclcpp::NodeOptions const &options)
-    : CascadeLifecycleNode("rpm_converter", options)
-{
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn RpmConverter::on_configure(
+  const rclcpp_lifecycle::State &){
+  
+  // Logs information
   RCLCPP_INFO(this->get_logger(), "RpmConverter constructor");
 
   auto default_qos = rclcpp::QoS(rclcpp::SystemDefaultsQoS());
@@ -30,7 +30,46 @@ RpmConverter::RpmConverter(rclcpp::NodeOptions const &options)
   // Timers
   m_publish_data_tmr = this->create_wall_timer(std::chrono::milliseconds(m_publish_time),
                                                std::bind(&RpmConverter::PublisherTmrCb, this));
+
+  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn RpmConverter::on_activate(
+  const rclcpp_lifecycle::State &){
+  // Activate the publisher
+  m_motors_rpm_out_pub->on_activate();
+  // Set the state variable on transition activate
+  m_state = TRANSITION_ACTIVATE;
+  // Return
+  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn RpmConverter::on_deactivate(
+  const rclcpp_lifecycle::State &){
+  // Deactivate the publisher
+  m_motors_rpm_out_pub->on_deactivate();
+  // Set the state variable on transition deactivate
+  m_state = TRANSITION_DEACTIVATE;
+  // Return function
+  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn RpmConverter::on_cleanup(
+  const rclcpp_lifecycle::State &){
+  // Set the state variable on transition cleanup
+  m_state = TRANSITION_CLEANUP;
+  // Return 
+  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn RpmConverter::on_shutdown(
+  const rclcpp_lifecycle::State &){
+  // Return function
+  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+int RpmConverter::getPublishTime(){return this->m_publish_time;}
+
 
 void RpmConverter::SpeedControlOutCb(const geometry_msgs::msg::Twist::SharedPtr msg)
 {
@@ -182,23 +221,30 @@ int main(int argc, char *argv[])
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
   rclcpp::executors::SingleThreadedExecutor executor;
-
   // Create the node intance
   auto rpm_converter_node = std::make_shared<RpmConverter>(options);
-
   // Add the node to executor
   executor.add_node(rpm_converter_node->get_node_base_interface());
-
-  // 
-  auto period = std::chrono::milliseconds(rpm_converter_node->m_publish_time);
+  // Get the period (in milliseconds) from converter node attribute
+  auto period = std::chrono::milliseconds(rpm_converter_node->getPublishTime());
+  // Define a ROS rate
   rclcpp::Rate r(period);
-  while (rclcpp::ok())
-  {
-    rpm_converter_node->PublishMotorsControl();
+  // Trigger the CONFIGURE transition
+  rpm_converter_node->trigger_transition(TRANSITION_CONFIGURE);
+  // Trigger the ACTIVATE transition
+  rpm_converter_node->trigger_transition(TRANSITION_ACTIVATE);
+
+  while (rclcpp::ok()){
     executor.spin_some();
+    if (rpm_converter_node->m_state == TRANSITION_ACTIVATE) {
+      rpm_converter_node->PublishMotorsControl();
+    }
     r.sleep();
   }
+
+  // Shutdown the node
   rclcpp::shutdown();
 
+  // Return
   return 0;
 }
